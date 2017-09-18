@@ -45,6 +45,7 @@
 						<div class="label">Presented By</div>
 						<div class="name">Geoff Appleby</div>
 					</div>
+					<div class="presentation-url">https://gapple.github.io/presentation-using-your-headers/</div>
 				</div>
 			</section>
 
@@ -56,7 +57,7 @@
 							<hr/>
 							<ul class="projects">
 								<li><a href="https://www.drupal.org/project/csp">Content-Security-Policy</a></li>
-								<li><a href="https://www.drupal.org/project/gacsp">GAnalytics</a></li>
+								<li><a href="https://www.drupal.org/project/gacsp">GAnalytics (gacsp)</a></li>
 								<li><a href="https://www.drupal.org/project/ie9">IE9 Compatibility</a></li>
 								<li><a href="https://www.drupal.org/project/persistent_login">Persistent Login</a></li>
 							</ul>
@@ -78,26 +79,37 @@
 		</section>
 
 		<section>
-			<section class="subsection color--ice" id="referrer-policy">
+			<section class="subsection color--ice" id="content-type-options">
 				<div class="grid-wrapper">
 					<div class="logo"></div>
-					<h1>Referrer Policy</h1>
+					<h1>X-Content-Type-Options</h1>
 					<div class="description">
 					</div>
 				</div>
+				<aside class="notes" data-markdown>
+					Trust `Content-Type` header; no auto-detection
+
+					affects style &amp; script
+				</aside>
 			</section>
-			<section id="referrer-policy--resources">
+			<section class="code color--dark" id="content-type-options--htaccess">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
-						<div class="section">Referrer Policy - Resources</div>
+						<div class="section">X-Content-Type-Options</div>
 					</div>
-					<div class="content">
-						<ul>
-							<li><a href="https://scotthelme.co.uk/a-new-security-header-referrer-policy/">A new security header: Referrer Policy (Scott Helme)</a></li>
-							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy">Referrer Policy (MDN Web Docs)</a></li>
-						</ul>
-					</div>
+					<figure class="code">
+						<pre><code class="lang-apache" data-escape>
+							# Various header fixes.
+							&lt;IfModule mod_headers.c&gt;
+								# Disable content sniffing, since it's an attack vector.
+								Header always set X-Content-Type-Options nosniff
+								# Disable Proxy header, since it's an attack vector.
+								RequestHeader unset Proxy
+							&lt;/IfModule&gt;
+						</code></pre>
+						<figcaption class="path">.htaccess</figcaption>
+					</figure>
 				</div>
 			</section>
 		</section>
@@ -110,15 +122,33 @@
 					<div class="description">
 					</div>
 				</div>
+				<aside class="notes" data-markdown>
+					Can page be in iframe?
+
+					Prevents clickjacking
+				</aside>
 			</section>
-			<section>
+			<section class="code color--dark" id="frame-options--htaccess">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
 						<div class="section">X-Frame-Options</div>
 					</div>
-					<div class="content">Content</div>
+					<figure class="code">
+						<pre><code class="lang-php">
+							// Prevent browsers from sniffing a response and picking a MIME type
+							// different from the declared content-type, since that can lead to
+							// XSS and other vulnerabilities.
+							// https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+							$response->headers->set('X-Content-Type-Options', 'nosniff', FALSE);
+							$response->headers->set('X-Frame-Options', 'SAMEORIGIN', FALSE);
+						</code></pre>
+						<figcaption class="path">Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()</figcaption>
+					</figure>
 				</div>
+				<aside class="notes" data-markdown>
+					Superceded by `content-security-policy: frame-ancestors`
+				</aside>
 			</section>
 		</section>
 
@@ -130,34 +160,116 @@
 					<div class="description">
 					</div>
 				</div>
+				<aside class="notes" data-markdown>
+					Chrome, Safari, IE (no FF)
+				</aside>
 			</section>
-			<section>
+			<section class="code color--dark" id="xss-protection--code">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
 						<div class="section">X-XSS-Protection</div>
 					</div>
-					<div class="content">Content</div>
+					<figure class="code">
+						<pre><code class="no-highlight">
+							X-XSS-Protection: 0
+
+							X-XSS-Protection: 1
+
+							X-XSS-Protection: 1; mode=block
+
+							X-XSS-Protection: 1; report=&lt;reporting-uri&gt;
+						</code></pre>
+					</figure>
 				</div>
+				<aside class="notes" data-markdown>
+					`1`: remove unsafe parts
+					  (not recommended; can be tricked to remove legitimate code)
+
+					`1; mode=block`: prevent page rendering
+
+					report is Chrome only
+				</aside>
 			</section>
 		</section>
 
 		<section>
-			<section class="subsection color--ice" id="content-type-options">
+			<section class="subsection color--ice" id="referrer-policy">
 				<div class="grid-wrapper">
 					<div class="logo"></div>
-					<h1>X-Content-Type-Options</h1>
+					<h1>Referrer Policy</h1>
 					<div class="description">
 					</div>
 				</div>
 			</section>
-			<section>
+			<section class="code color--dark" id="referrer-policy--values">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
-						<div class="section">X-Content-Type-Options</div>
+						<div class="section">Referrer Policy</div>
 					</div>
-					<div class="content">Content</div>
+					<figure class="code">
+						<pre><code class="no-highlight">
+							no-referrer
+
+							no-referrer-when-downgrade
+
+							same-origin
+
+							origin
+
+							strict-origin
+
+							origin-when-cross-origin
+
+							strict-origin-when-cross-origin
+
+							unsafe-url
+						</code></pre>
+					</figure>
+				</div>
+				<aside class="notes" data-markdown>
+					Chrome & FF
+
+					Some not supported by Chrome
+
+					Default is no-referrer-when-downgrade
+
+					Can set multiple; strict then less so if supported
+
+					Can also be set by CSP
+				</aside>
+			</section>
+			<section id="referrer-policy--example">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Referrer Policy</div>
+					</div>
+					<div class="content">
+						<h2>strict-origin-when-cross-origin</h2>
+						<table>
+							<tr><th>Source</th><th>Destination</th><th>Referrer</th></tr>
+							<tr><td>https://example.com/page-one</td><td>https://example.com/page-two</td><td>https://example.com/page-one</td></tr>
+							<tr><td>https://example.com/page-one</td><td>https://google.com/</td><td>https://example.com</td></tr>
+							<tr><td>https://example.com/page-one</td><td>http://example.com/page-two</td><td>NULL</td></tr>
+							<tr><td>https://example.com/page-one</td><td>http://google.com/</td><td>NULL</td></tr>
+						</table>
+					</div>
+				</div>
+			</section>
+			<section id="referrer-policy--resources">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Referrer Policy - Resources</div>
+					</div>
+					<div class="content">
+						<ul>
+							<li><a href="https://scotthelme.co.uk/a-new-security-header-referrer-policy/">A new security header: Referrer Policy [Scott Helme]</a></li>
+							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy">Referrer Policy [MDN Web Docs]</a></li>
+						</ul>
+					</div>
 				</div>
 			</section>
 		</section>
@@ -170,6 +282,35 @@
 					<div class="description">
 					</div>
 				</div>
+				<aside class="notes" data-markdown>
+					Secure connection should be the default
+
+					Let's Encrypt; free, automated
+					- Not supported by Acquia
+					- Supported by Pantheon, Dreamhost
+
+					Cloudflare
+				</aside>
+			</section>
+			<section class="code color--dark" id="hsts--apache">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Strict Transport Security</div>
+					</div>
+					<figure class="code">
+						<pre><code class="lang-apache" data-escape>
+							# Set HSTS header for six months
+							&lt;IfModule mod_headers.c&gt;
+									Header always set Strict-Transport-Security "max-age=15552000"
+							&lt;/IfModule&gt;
+						</code></pre>
+						<figcaption class="path">vhosts.conf</figcaption>
+					</figure>
+				</div>
+				<aside class="notes" data-markdown>
+					Set in server config alongside certificate
+				</aside>
 			</section>
 			<section id="hsts--resources">
 				<div class="grid-wrapper">
@@ -179,7 +320,7 @@
 					</div>
 					<div class="content">
 						<ul>
-							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security">Strict Transport Security (MDN Web Docs)</a></li>
+							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security">Strict Transport Security [MDN Web Docs]</a></li>
 						</ul>
 					</div>
 				</div>
@@ -195,6 +336,83 @@
 					</div>
 				</div>
 			</section>
+			<section id="hpkp--sos">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Public Key Pinning</div>
+					</div>
+					<div class="content">
+						<blockquote class="twitter-tweet" data-lang="en">
+							<img src="images/twitter/swiftonsecurity.jpg"/>
+							<p lang="en" dir="ltr">Fascinating thread from a leader in HTTPS
+								ecosystem — providing HPKP capability to unvetted web developers
+								was a mistake, in retrospect. <a href="https://t.co/qUjaXym7uT">https://t.co/qUjaXym7uT</a>
+							</p>
+							<span class="author">&mdash; SwiftOnSecurity (@SwiftOnSecurity)</span>
+							<a href="https://twitter.com/SwiftOnSecurity/status/900578143869730816">24 Aug 2017</a>
+						</blockquote>
+						<blockquote class="twitter-tweet" data-conversation="none" data-lang="en">
+							<img src="images/twitter/swiftonsecurity.jpg"/>
+							<p lang="en" dir="ltr">tl;dr the people
+							who standardized HPKP say don&#39;t use it, it sounds like a cool
+							hedge, but the risk incredible long-term for theoretical gain</p>
+							<span class="author">&mdash; SwiftOnSecurity (@SwiftOnSecurity)</span>
+							<a href="https://twitter.com/SwiftOnSecurity/status/900582361909350400">24 Aug 2017</a>
+						</blockquote>
+					</div>
+				</div>
+			</section>
+			<section id="hpkp--footgun">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Public Key Pinning</div>
+					</div>
+					<div class="content">
+						<blockquote class="twitter-tweet" data-conversation="none" data-lang="en">
+							<img src="images/twitter/sleevi_.jpg"/>
+							<p lang="en" dir="ltr">But pinning is terrible - and harms the
+								ecosystem more than helps, as we&#39;ve seen. It was a bad thing
+								to standardize 😔
+							</p>
+							<span class="author">&mdash; Ryan Sleevi (@sleevi_)</span>
+							<a href="https://twitter.com/sleevi_/status/900571558896435201">24 Aug 2017</a>
+						</blockquote>
+						<blockquote class="twitter-tweet" data-conversation="none" data-lang="en">
+							<img src="images/twitter/mnot.jpg"/>
+							<p lang="en" dir="ltr">Interesting. I should buy you some scotch
+								so I can learn more.
+							</p>
+							<span class="author">&mdash; Mark Nottingham (@mnot)</span>
+							<a href="https://twitter.com/mnot/status/900571904683134976">24 Aug 2017</a>
+						</blockquote>
+						<blockquote class="twitter-tweet" data-conversation="none" data-lang="en">
+							<img src="images/twitter/sleevi_.jpg"/>
+							<p lang="en" dir="ltr">No scotch needed to get me to apologize for
+								my sins and the painful lessons learned. I actively discourage
+								it now, even w/ ecosystem risk
+							</p>
+							<span class="author">&mdash; Ryan Sleevi (@sleevi_)</span>
+							<a href="https://twitter.com/sleevi_/status/900572573171412993">24 Aug 2017</a>
+						</blockquote>
+						<blockquote class="twitter-tweet" data-conversation="none" data-lang="en">
+							<img src="images/twitter/sleevi_.jpg"/>
+							<p lang="en" dir="ltr">But pinning your own key is a still a
+								footgun. I know of several who pinned to keys they couldn&#39;t
+								legit get certs for when needed
+							</p>
+							<span class="author">&mdash; Ryan Sleevi (@sleevi_)</span>
+							<a href="https://twitter.com/sleevi_/status/900580836159967232">24 Aug 2017</a>
+						</blockquote>
+					</div>
+				</div>
+				<aside class="notes" data-markdown>
+					New things that are better
+					- Certificate Transparency
+					- Certificate Authority Authorization
+				</aside>
+			</section>
 			<section id="hpkp--resources">
 				<div class="grid-wrapper">
 					<div class="header">
@@ -203,7 +421,9 @@
 					</div>
 					<div class="content">
 						<ul>
-							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning">Public Key Pinning (MDN Web Docs)</a></li>
+							<li><a href="https://scotthelme.co.uk/im-giving-up-on-hpkp/">I'm giving up on HPKP [Scott Helme]</a></li>
+							<li><a href="https://www.smashingmagazine.com/be-afraid-of-public-key-pinning/">Be Afraid Of HTTP Public Key Pinning (HPKP) [Smashing Magazine]</a></li>
+							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Public_Key_Pinning">Public Key Pinning [MDN Web Docs]</a></li>
 						</ul>
 					</div>
 				</div>
@@ -267,13 +487,24 @@
 					</div>
 				</div>
 			</section>
-			<section>
+			<section class="code color--dark" id="csp.module--libraries.yml">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
-						<div class="section">csp.module</div>
+						<div class="section">csp.module - *.libraries.yml</div>
 					</div>
-					<div class="content">Content</div>
+					<figure class="code">
+						<pre><code class="lang-yaml">
+								testlib:
+									version: "1.x"
+									css:
+										theme:
+											https://example.com/css/testlib.css: {}
+									js:
+										http://example.com/js/testlib.js: {}
+							</code></pre>
+						<figcaption>mymodule.libraries.yml</figcaption>
+					</figure>
 				</div>
 			</section>
 		</section>
