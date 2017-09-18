@@ -134,3 +134,57 @@ blockquote.twitter-tweet {
   border: 1px solid #ccc;
   padding: 0.5em;
 }
+
+#sprints, #feedback {
+  background-image: url('../images/drupalcon-vienna-bg.png');
+  background-size: cover;
+  background-position: top center;
+  color: #4c697d;
+  text-align: center;
+}
+#sprints .grid-wrapper,
+#feedback .grid-wrapper {
+  padding-top: 20vmin;
+}
+#sprints h2 {
+  color: #cd9b23;
+  font-weight: lighter;
+}
+#sprints .grid-wrapper {
+  grid-template-areas: "title" "rooms" "hashtag";
+  grid-template-rows: auto auto 1fr;
+}
+
+#sprints .sprint-types {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+}
+#sprints .sprint-types > div {
+  width: 25%;
+}
+#sprints .sprint-types span {
+  display: block;
+}
+#sprints .sprint-types .sprint-title {
+  font-size: 1.8em;
+}
+#sprints .sprint-title {
+  color: #cd9b23;
+}
+
+#sprints .hashtag {
+  align-self: end;
+  color: #cd9b23;
+  font-size: 3em;
+}
+
+#feedback .content {
+  font-size: 2em;
+}
+#feedback .content p {
+  margin-bottom: 2em;
+}
+#feedback [href^="https://events.drupal.org"] {
+  font-size: 0.75em;
+}
