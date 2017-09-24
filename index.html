@@ -92,6 +92,36 @@
 					affects style &amp; script
 				</aside>
 			</section>
+			<section class="code color--dark" id="content-type-options--response-subscriber">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">X-Content-Type-Options</div>
+					</div>
+					<figure class="code">
+						<pre><code class="lang-php">
+							public function onRespond(FilterResponseEvent $event) {
+
+								$response = $event->getResponse();
+
+								// ...
+
+								// Prevent browsers from sniffing a response and picking a MIME type
+								// different from the declared content-type, since that can lead to
+								// XSS and other vulnerabilities.
+								// https://www.owasp.org/index.php/List_of_useful_HTTP_headers
+								$response->headers->set('X-Content-Type-Options', 'nosniff', FALSE);
+
+								// ...
+							}
+						</code></pre>
+						<figcaption class="path">Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()</figcaption>
+					</figure>
+				</div>
+				<aside class="notes" data-markdown>
+
+				</aside>
+			</section>
 			<section class="code color--dark" id="content-type-options--htaccess">
 				<div class="grid-wrapper">
 					<div class="header">
@@ -111,6 +141,9 @@
 						<figcaption class="path">.htaccess</figcaption>
 					</figure>
 				</div>
+				<aside class="notes" data-markdown>
+					htaccess targets non-html (non-drupal) requests.
+				</aside>
 			</section>
 		</section>
 
@@ -128,6 +161,20 @@
 					Prevents clickjacking
 				</aside>
 			</section>
+			<section class="code" id="frame-options--values">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Frame Options</div>
+					</div>
+					<ul>
+						<li>SAMEORIGIN</li>
+						<li>NONE</li>
+					</ul>
+				</div>
+				<aside class="notes" data-markdown>
+				</aside>
+			</section>
 			<section class="code color--dark" id="frame-options--htaccess">
 				<div class="grid-wrapper">
 					<div class="header">
@@ -136,12 +183,16 @@
 					</div>
 					<figure class="code">
 						<pre><code class="lang-php">
-							// Prevent browsers from sniffing a response and picking a MIME type
-							// different from the declared content-type, since that can lead to
-							// XSS and other vulnerabilities.
-							// https://www.owasp.org/index.php/List_of_useful_HTTP_headers
-							$response->headers->set('X-Content-Type-Options', 'nosniff', FALSE);
-							$response->headers->set('X-Frame-Options', 'SAMEORIGIN', FALSE);
+							public function onRespond(FilterResponseEvent $event) {
+
+								$response = $event->getResponse();
+
+								// ...
+
+								$response->headers->set('X-Frame-Options', 'SAMEORIGIN', FALSE);
+
+								// ...
+							}
 						</code></pre>
 						<figcaption class="path">Drupal\Core\EventSubscriber\FinishResponseSubscriber::onRespond()</figcaption>
 					</figure>
@@ -164,23 +215,21 @@
 					Chrome, Safari, IE (no FF)
 				</aside>
 			</section>
-			<section class="code color--dark" id="xss-protection--code">
+			<section class="code" id="xss-protection--values">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
 						<div class="section">X-XSS-Protection</div>
 					</div>
-					<figure class="code">
-						<pre><code class="no-highlight">
-							X-XSS-Protection: 0
+					<ul>
+							<li>0</li>
 
-							X-XSS-Protection: 1
+							<li>1</li>
 
-							X-XSS-Protection: 1; mode=block
+							<li>1; mode=block</li>
 
-							X-XSS-Protection: 1; report=&lt;reporting-uri&gt;
-						</code></pre>
-					</figure>
+							<li class="fragment">1; report=&lt;reporting-uri&gt;</li>
+					</ul>
 				</div>
 				<aside class="notes" data-markdown>
 					`1`: remove unsafe parts
@@ -202,31 +251,22 @@
 					</div>
 				</div>
 			</section>
-			<section class="code color--dark" id="referrer-policy--values">
+			<section class="code" id="referrer-policy--values">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
 						<div class="section">Referrer Policy</div>
 					</div>
-					<figure class="code">
-						<pre><code class="no-highlight">
-							no-referrer
-
-							no-referrer-when-downgrade
-
-							same-origin
-
-							origin
-
-							strict-origin
-
-							origin-when-cross-origin
-
-							strict-origin-when-cross-origin
-
-							unsafe-url
-						</code></pre>
-					</figure>
+					<ul>
+							<li>no-referrer</li>
+							<li>no-referrer-when-downgrade</li>
+							<li>same-origin</li>
+							<li>origin</li>
+							<li>strict-origin</li>
+							<li>origin-when-cross-origin</li>
+							<li>strict-origin-when-cross-origin</li>
+							<li>unsafe-url</li>
+					</ul>
 				</div>
 				<aside class="notes" data-markdown>
 					Chrome & FF
@@ -275,6 +315,80 @@
 		</section>
 
 		<section>
+			<section class="subsection color--ice" id="event-subscriber">
+				<div class="grid-wrapper">
+					<div class="logo"></div>
+					<h1>Drupal Event Subscribers</h1>
+					<div class="description">
+					</div>
+				</div>
+				<aside class="notes" data-markdown>
+
+				</aside>
+			</section>
+			<section class="code color--dark" id="event-subscriber--service">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Event Subscriber</div>
+					</div>
+					<figure class="code">
+						<pre><code class="lang-yml" data-escape>
+							services:
+								my_module.response_listener:
+									class: Drupal\my_module\EventSubscriber\ResponseSubscriber
+									arguments: ['@config.factory']
+									tags:
+										- { name: event_subscriber }
+						</code></pre>
+						<figcaption class="path">my_module.services.yml</figcaption>
+					</figure>
+				</div>
+				<aside class="notes" data-markdown>
+
+				</aside>
+			</section>
+			<section class="code color--dark" id="event-subscriber--class">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Event Subscriber</div>
+					</div>
+					<figure class="code">
+						<pre><code class="lang-php" data-escape>
+							namespace Drupal\my_module\EventSubscriber;
+
+							use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+							use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
+
+							class ResponseSubscriber implements EventSubscriberInterface {
+
+								public static function getSubscribedEvents() {
+									$events[KernelEvents::RESPONSE] = ['onKernelResponse'];
+									return $events;
+								}
+
+								public function onKernelResponse(FilterResponseEvent $event) {
+									if (!$event->isMasterRequest()) {
+										return;
+									}
+
+									$response = $event->getResponse();
+
+									$response->headers->set('HeaderName', 'header-value');
+								}
+							}
+						</code></pre>
+						<figcaption class="path">src/EventSubscriber/ResponseSubscriber</figcaption>
+					</figure>
+				</div>
+				<aside class="notes" data-markdown>
+					Drupal core won't overwrite previously set headers.
+				</aside>
+			</section>
+		</section>
+
+		<section>
 			<section class="subsection color--ice" id="hsts">
 				<div class="grid-wrapper">
 					<div class="logo"></div>
@@ -286,8 +400,8 @@
 					Secure connection should be the default
 
 					Let's Encrypt; free, automated
-					- Not supported by Acquia
 					- Supported by Pantheon, Dreamhost
+					- Not supported by Acquia
 
 					Cloudflare
 				</aside>
@@ -302,14 +416,22 @@
 						<pre><code class="lang-apache" data-escape>
 							# Set HSTS header for six months
 							&lt;IfModule mod_headers.c&gt;
+
+									SSLEngine On
+									SSLCertificateFile    example.crt
+									SSLCertificateKeyFile example.key
+
 									Header always set Strict-Transport-Security "max-age=15552000"
+
 							&lt;/IfModule&gt;
 						</code></pre>
 						<figcaption class="path">vhosts.conf</figcaption>
 					</figure>
 				</div>
 				<aside class="notes" data-markdown>
-					Set in server config alongside certificate
+					1. Set in server config alongside certificate
+					2. Set in htaccess
+					3. Set on Response
 				</aside>
 			</section>
 			<section id="hsts--resources">
@@ -320,6 +442,7 @@
 					</div>
 					<div class="content">
 						<ul>
+							<li><a href="https://letsencrypt.org">Let's Encrypt</a></li>
 							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security">Strict Transport Security [MDN Web Docs]</a></li>
 						</ul>
 					</div>
@@ -430,29 +553,29 @@
 			</section>
 		</section>
 
-		<section>
-			<section class="subsection color--ice" id="subresource-integrity">
-				<div class="grid-wrapper">
-					<div class="logo"></div>
-					<h1>Subresource Integrity</h1>
-					<div class="description">
-					</div>
-				</div>
-			</section>
-			<section id="subresource-integrity--resources">
-				<div class="grid-wrapper">
-					<div class="header">
-						<div class="logo"></div>
-						<div class="section">Subresource Integrity - Resources</div>
-					</div>
-					<div class="content">
-						<ul>
-							<li><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity">Subresource Integrity (MDN Web Docs)</a></li>
-						</ul>
-					</div>
-				</div>
-			</section>
-		</section>
+		<!--<section>-->
+			<!--<section class="subsection color&#45;&#45;ice" id="subresource-integrity">-->
+				<!--<div class="grid-wrapper">-->
+					<!--<div class="logo"></div>-->
+					<!--<h1>Subresource Integrity</h1>-->
+					<!--<div class="description">-->
+					<!--</div>-->
+				<!--</div>-->
+			<!--</section>-->
+			<!--<section id="subresource-integrity&#45;&#45;resources">-->
+				<!--<div class="grid-wrapper">-->
+					<!--<div class="header">-->
+						<!--<div class="logo"></div>-->
+						<!--<div class="section">Subresource Integrity - Resources</div>-->
+					<!--</div>-->
+					<!--<div class="content">-->
+						<!--<ul>-->
+							<!--<li><a href="https://developer.mozilla.org/en-US/docs/Web/Security/Subresource_Integrity">Subresource Integrity (MDN Web Docs)</a></li>-->
+						<!--</ul>-->
+					<!--</div>-->
+				<!--</div>-->
+			<!--</section>-->
+		<!--</section>-->
 
 		<section>
 			<section class="subsection color--ice" id="csp">
@@ -462,6 +585,73 @@
 					<div class="description">
 					</div>
 				</div>
+			</section>
+			<section id="csp--alert">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Content Security Policy</div>
+					</div>
+					<div class="content">
+						<img src="images/csp-alert.png"/>
+					</div>
+				</div>
+			</section>
+			<section id="csp--console">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Content Security Policy</div>
+					</div>
+					<div class="content">
+						<img src="images/csp-console.png"/>
+					</div>
+				</div>
+			</section>
+			<section class="code" id="csp--keys">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Content Security Policy</div>
+					</div>
+					<ul>
+						<li>default-src</li>
+						<li>script-src</li>
+						<li>style-src</li>
+						<li>img-src</li>
+						<li>connect-src</li>
+						<li>frame-src</li>
+						<li>report-uri</li>
+					</ul>
+				</div>
+				<aside class="notes" data-markdown>
+					`frame-src` replaces `x-frame-options`
+
+					`report-uri` being deprecated in favour of `report-to`
+				</aside>
+			</section>
+			<section class="code" id="csp--values">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Content Security Policy</div>
+					</div>
+					<ul>
+						<li>'none'</li>
+						<li>'self'</li>
+						<li>'all'</li>
+						<li>'unsafe-inline'</li>
+						<li>'unsafe-eval'</li>
+						<li>example.com</li>
+						<li>*.example.com</li>
+						<li>https://example.com</li>
+					</ul>
+				</div>
+				<aside class="notes" data-markdown>
+					Can be combined
+
+					wildcards?
+				</aside>
 			</section>
 			<section class="code color--dark" id="csp--drd">
 				<div class="grid-wrapper">
@@ -482,7 +672,6 @@
 					</figure>
 				</div>
 				<aside class="notes" data-markdown>
-					Set in server config alongside certificate
 				</aside>
 			</section>
 			<section id="csp--resources">
@@ -513,7 +702,7 @@
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
-						<div class="section">csp.module - *.libraries.yml</div>
+						<div class="section">csp.module</div>
 					</div>
 					<figure class="code">
 						<pre><code class="lang-yaml">
@@ -528,6 +717,59 @@
 						<figcaption>mymodule.libraries.yml</figcaption>
 					</figure>
 				</div>
+				<aside class="notes">
+					Two big items in D8
+						- No inline JS
+						- Libraries
+				</aside>
+			</section>
+			<section id="csp.module--next">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">csp.module</div>
+					</div>
+					<ul>
+						<li>Dynamic external scripts</li>
+						<li>API Requests</li>
+					</ul>
+				</div>
+			</section>
+		</section>
+
+		<section>
+			<section class="subsection color--ice" id="csp-segmentation">
+				<div class="grid-wrapper">
+					<div class="logo"></div>
+					<h1>CSP Segmentation</h1>
+					<div class="description">
+					</div>
+				</div>
+			</section>
+			<section class="code color--dark" id="csp-segmentation--policy">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">CSP Segmentation</div>
+					</div>
+					<figure class="code">
+						<pre><code class="no-highlight">
+								Content-Security-Policy-Report-Only:
+									default-src 'self';
+									script-src assets.example.com;
+									style-src assets.example.com;
+									img-src assets.example.com files.example.com;
+									connect-src 'self';
+							</code></pre>
+						<figcaption>mymodule.libraries.yml</figcaption>
+					</figure>
+				</div>
+				<aside class="notes">
+					- Server config to limit content on each domain
+					- Drupal hooks to alter URLs
+						- Stream Wrapper Decorator
+						- `hook_file_url_alter()`
+				</aside>
 			</section>
 		</section>
 

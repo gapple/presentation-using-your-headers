@@ -17,6 +17,21 @@
   opacity: 0.5;
 }
 
+img {
+  display: block;
+}
+
+.reveal ul {
+  font-size: 1.5em;
+  align-self: center;
+  justify-self: center;
+}
+@media (min-width: 1280px) {
+  .reveal ul {
+    width: calc(80% - 1em);
+  }
+}
+
 #about {
   background-image: url('../images/eaglebluffs.jpg');
   background-size: cover;
@@ -38,8 +53,10 @@
 }
 #about aside ul {
   display: block;
+  font-size: inherit;
   list-style: none;
   margin: 2.5vmin 0 0;
+  width: auto;
 }
 #about .projects {
   text-align: center;
@@ -121,6 +138,14 @@ blockquote.twitter-tweet {
   }
 }
 
+#frame-options--values ul,
+#xss-protection--values ul,
+#referrer-policy--values ul,
+#csp--keys ul,
+#csp--values ul {
+  font-family: monospace;
+}
+
 #referrer-policy--example h2 {
   width: 80%;
   margin: 0 auto 1em;
@@ -133,6 +158,13 @@ blockquote.twitter-tweet {
 #referrer-policy--example table td {
   border: 1px solid #ccc;
   padding: 0.5em;
+}
+#csp--alert img {
+  max-height: calc(100vmin - (10vmin * 2) - 5vmin - 4.5vmin);
+  margin: auto;
+}
+#csp--console img {
+  margin: auto;
 }
 
 #sprints, #feedback {
