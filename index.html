@@ -659,7 +659,7 @@
 					</div>
 					<figure class="code">
 						<pre><code class="no-highlight" data-escape>
-							Content-Security-Policy-Report-Only:
+							Content-Security-Policy:
 								default-src 'self';
 								script-src 'self' 'unsafe-inline' code.jquery.com www.google.com www.google-analytics.com;
 								style-src 'self' 'unsafe-inline' netdna.bootstrapcdn.com www.google.com ajax.googleapis.com;
@@ -670,6 +670,31 @@
 					</figure>
 				</div>
 				<aside class="notes" data-markdown>
+				</aside>
+			</section>
+			<section class="code color--dark" id="csp--segmentation">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Content Security Policy</div>
+					</div>
+					<figure class="code">
+						<pre><code class="no-highlight">
+								Content-Security-Policy:
+									default-src 'self';
+									script-src assets.example.com;
+									style-src assets.example.com;
+									img-src assets.example.com files.example.com;
+									connect-src 'self';
+							</code></pre>
+						<figcaption>mymodule.libraries.yml</figcaption>
+					</figure>
+				</div>
+				<aside class="notes">
+					- Server config to limit content on each domain
+					- Drupal hooks to alter URLs
+					- Stream Wrapper Decorator
+					- `hook_file_url_alter()`
 				</aside>
 			</section>
 			<section id="csp--resources">
@@ -732,42 +757,6 @@
 						<li>API Requests</li>
 					</ul>
 				</div>
-			</section>
-		</section>
-
-		<section>
-			<section class="subsection color--ice" id="csp-segmentation">
-				<div class="grid-wrapper">
-					<div class="logo"></div>
-					<h1>CSP Segmentation</h1>
-					<div class="description">
-					</div>
-				</div>
-			</section>
-			<section class="code color--dark" id="csp-segmentation--policy">
-				<div class="grid-wrapper">
-					<div class="header">
-						<div class="logo"></div>
-						<div class="section">CSP Segmentation</div>
-					</div>
-					<figure class="code">
-						<pre><code class="no-highlight">
-								Content-Security-Policy-Report-Only:
-									default-src 'self';
-									script-src assets.example.com;
-									style-src assets.example.com;
-									img-src assets.example.com files.example.com;
-									connect-src 'self';
-							</code></pre>
-						<figcaption>mymodule.libraries.yml</figcaption>
-					</figure>
-				</div>
-				<aside class="notes">
-					- Server config to limit content on each domain
-					- Drupal hooks to alter URLs
-						- Stream Wrapper Decorator
-						- `hook_file_url_alter()`
-				</aside>
 			</section>
 		</section>
 
