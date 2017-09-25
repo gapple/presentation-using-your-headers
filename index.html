@@ -414,15 +414,13 @@
 					</div>
 					<figure class="code">
 						<pre><code class="lang-apache" data-escape>
+							SSLEngine On
+							SSLCertificateFile    example.crt
+							SSLCertificateKeyFile example.key
+
 							# Set HSTS header for six months
 							&lt;IfModule mod_headers.c&gt;
-
-									SSLEngine On
-									SSLCertificateFile    example.crt
-									SSLCertificateKeyFile example.key
-
 									Header always set Strict-Transport-Security "max-age=15552000"
-
 							&lt;/IfModule&gt;
 						</code></pre>
 						<figcaption class="path">vhosts.conf</figcaption>
