@@ -180,7 +180,7 @@ blockquote.twitter-tweet {
   background-size: contain;
   background-repeat: no-repeat;
   background-origin: content-box;
-  padding: 5vmin;
+  padding: 0;
 }
 
 #sprints, #feedback {
