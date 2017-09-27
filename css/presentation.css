@@ -167,6 +167,11 @@ blockquote.twitter-tweet {
   margin: auto;
 }
 
+#csp-module--todo h2 {
+  font-family: monospace;
+  color: #859900;
+}
+
 #csp-module--project-page .grid-wrapper {
   background-image: url('../images/csp-project-page.png');
   background-position: center;
