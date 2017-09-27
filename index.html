@@ -165,11 +165,12 @@
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
-						<div class="section">Frame Options</div>
+						<div class="section">X-Frame-Options</div>
 					</div>
 					<ul>
+						<li>DENY</li>
 						<li>SAMEORIGIN</li>
-						<li>NONE</li>
+						<li>ALLOW-FROM https://example.com/</li>
 					</ul>
 				</div>
 				<aside class="notes" data-markdown>
@@ -198,6 +199,8 @@
 					</figure>
 				</div>
 				<aside class="notes" data-markdown>
+					Must be set in header; not meta tag
+
 					Superceded by `content-security-policy: frame-ancestors`
 				</aside>
 			</section>
@@ -379,7 +382,7 @@
 								}
 							}
 						</code></pre>
-						<figcaption class="path">src/EventSubscriber/ResponseSubscriber</figcaption>
+						<figcaption class="path">src/EventSubscriber/ResponseSubscriber.php</figcaption>
 					</figure>
 				</div>
 				<aside class="notes" data-markdown>
@@ -399,11 +402,20 @@
 				<aside class="notes" data-markdown>
 					Secure connection should be the default
 
+					Browser warnings (Chrome, FF)
+					- Previously passwords, credit cards
+					- Soon any form (Chrome next month)
+						- Search, Views filters
+
 					Let's Encrypt; free, automated
 					- Supported by Pantheon, Dreamhost
 					- Not supported by Acquia
 
 					Cloudflare
+
+					HSTS enforces
+					- Must have certificate
+					- Can't skip warnings
 				</aside>
 			</section>
 			<section class="code color--dark" id="hsts--apache">
@@ -442,6 +454,8 @@
 						<ul>
 							<li><a href="https://letsencrypt.org">Let's Encrypt</a></li>
 							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security">Strict Transport Security [MDN Web Docs]</a></li>
+							<li><a href="https://blog.mozilla.org/security/2017/01/20/communicating-the-dangers-of-non-secure-http/">Communicating the Dangers of Non-Secure HTTP [Mozilla Security Blog]</a></li>
+							<li><a href="https://security.googleblog.com/2017/04/next-steps-toward-more-connection.html">Next Steps Toward More Connection Security [Google Security Blog]</a></li>
 						</ul>
 					</div>
 				</div>
@@ -456,6 +470,9 @@
 					<div class="description">
 					</div>
 				</div>
+				<aside class="notes" data-markdown>
+					! Warning !
+				</aside>
 			</section>
 			<section id="hpkp--sos">
 				<div class="grid-wrapper">
@@ -483,6 +500,9 @@
 						</blockquote>
 					</div>
 				</div>
+				<aside class="notes" data-markdown>
+
+				</aside>
 			</section>
 			<section id="hpkp--footgun">
 				<div class="grid-wrapper">
@@ -619,11 +639,14 @@
 						<li>img-src</li>
 						<li>connect-src</li>
 						<li>frame-src</li>
-						<li>report-uri</li>
+						<li class="fragment" data-fragment-index="1">upgrade-insecure-requests</li>
+						<li class="fragment" data-fragment-index="1">report-uri</li>
 					</ul>
 				</div>
 				<aside class="notes" data-markdown>
 					`frame-src` replaces `x-frame-options`
+
+					`upgrade-insecure-requests`
 
 					`report-uri` being deprecated in favour of `report-to`
 				</aside>
@@ -640,15 +663,16 @@
 						<li>'all'</li>
 						<li>'unsafe-inline'</li>
 						<li>'unsafe-eval'</li>
-						<li>example.com</li>
-						<li>*.example.com</li>
-						<li>https://example.com</li>
+						<li class="fragment" data-fragment-index="1">example.com</li>
+						<li class="fragment" data-fragment-index="1">*.example.com</li>
+						<li class="fragment" data-fragment-index="2">https://example.com</li>
+						<li class="fragment" data-fragment-index="2">https:</li>
 					</ul>
 				</div>
 				<aside class="notes" data-markdown>
-					Can be combined
+					Keywords, Domains (with wildcards), Protocols
 
-					wildcards?
+					Can be combined
 				</aside>
 			</section>
 			<section class="code color--dark" id="csp--drd">
@@ -665,7 +689,34 @@
 								style-src 'self' 'unsafe-inline' netdna.bootstrapcdn.com www.google.com ajax.googleapis.com;
 								img-src 'self' s3.amazonaws.com www.google-analytics.com stats.g.doubleclick.net;
 								connect-src 'self' www.drupal.org www.google-analytics.com;
+								report-uri https://gapple.report-uri.io/r/default/csp/enforce;
+						</code></pre>
+					</figure>
+				</div>
+				<aside class="notes" data-markdown>
+				</aside>
+			</section>
+			<section class="code color--dark" id="csp--report-only">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">Content Security Policy</div>
+					</div>
+					<figure class="code">
+						<pre><code class="no-highlight" data-escape>
+							Content-Security-Policy-Report-Only:
+								default-src 'self';
+								script-src 'self';
+								style-src 'self';
+								img-src 'self';
+								connect-src 'self';
 								report-uri https://gapple.report-uri.io/r/default/csp/reportOnly;
+
+							Content-Security-Policy:
+								script-src 'self';
+								style-src 'self';
+								img-src 'all';
+								report-uri https://gapple.report-uri.io/r/default/csp/enforce;
 						</code></pre>
 					</figure>
 				</div>
@@ -705,6 +756,7 @@
 					</div>
 					<div class="content">
 						<ul>
+							<li><a href="https://report-uri.io/">Report-URI.io</a></li>
 							<li><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP">Content Security Policy (MDN Web Docs)</a></li>
 						</ul>
 					</div>
@@ -713,7 +765,7 @@
 		</section>
 
 		<section>
-			<section class="subsection color--ice" id="csp.module">
+			<section class="subsection color--ice" id="csp-module">
 				<div class="grid-wrapper">
 					<div class="logo"></div>
 					<h1>csp.module</h1>
@@ -721,7 +773,7 @@
 					</div>
 				</div>
 			</section>
-			<section class="code color--dark" id="csp.module--libraries.yml">
+			<section class="code color--dark" id="csp-module--libraries.yml">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
@@ -746,16 +798,77 @@
 						- Libraries
 				</aside>
 			</section>
-			<section id="csp.module--next">
+			<section id="csp-module--project-page">
+				<div class="grid-wrapper"></div>
+			</section>
+			<section class="color--dark" id="csp-module--ga-snippet">
 				<div class="grid-wrapper">
 					<div class="header">
 						<div class="logo"></div>
 						<div class="section">csp.module</div>
 					</div>
-					<ul>
-						<li>Dynamic external scripts</li>
-						<li>API Requests</li>
-					</ul>
+					<figure class="code">
+						<pre><code class="lang-html">
+							&lt;!-- Google Analytics --&gt;
+							&lt;script&gt;
+								(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+									(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+										m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+								})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+			
+								ga('create', 'UA-XXXXX-Y', 'auto');
+								ga('send', 'pageview');
+							&lt;/script&gt;
+							&lt;!-- End Google Analytics --&gt;
+							</code></pre>
+					</figure>
+				</div>
+				<aside class="notes">
+					- inline
+					- external script
+				</aside>
+			</section>
+			<section class="color--dark" id="csp-module--ga-async-snippet">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">csp.module</div>
+					</div>
+					<figure class="code">
+						<pre><code class="lang-html">
+							&lt;!-- Google Analytics --&gt;
+							&lt;script&gt;
+								window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+								ga('create', 'UA-XXXXX-Y', 'auto');
+								ga('send', 'pageview');
+							&lt;/script&gt;
+							&lt;script async src='https://www.google-analytics.com/analytics.js'&gt;&lt;/script&gt;
+							&lt;!-- End Google Analytics --&gt;
+						</code></pre>
+					</figure>
+				</div>
+				<aside class="notes">
+					- inline
+					- external script
+				</aside>
+			</section>
+			<section id="csp-module--gacsp-project-page">
+				<div class="grid-wrapper"></div>
+			</section>
+			<section id="csp-module--todo">
+				<div class="grid-wrapper">
+					<div class="header">
+						<div class="logo"></div>
+						<div class="section">csp.module</div>
+					</div>
+					<div class="content">
+						<h2>// TODO</h2>
+						<ul>
+							<li>Report Logging</li>
+							<li>Dynamic Policy Directives</li>
+							<li>Manual Configuration</li>
+						</ul>
+					</div>
 				</div>
 			</section>
 		</section>

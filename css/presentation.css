@@ -167,6 +167,22 @@ blockquote.twitter-tweet {
   margin: auto;
 }
 
+#csp-module--project-page .grid-wrapper {
+  background-image: url('../images/csp-project-page.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+}
+#csp-module--gacsp-project-page .grid-wrapper {
+  background-image: url('../images/gacsp-project-page.png');
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-origin: content-box;
+  padding: 5vmin;
+}
+
 #sprints, #feedback {
   background-image: url('../images/drupalcon-vienna-bg.png');
   background-size: cover;
