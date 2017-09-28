@@ -720,8 +720,9 @@
 					<figure class="code">
 						<pre><code class="no-highlight" data-escape>
 							Content-Security-Policy:
-								script-src 'self';
-								style-src 'self';
+								default-src *;
+								script-src * 'unsafe-inline';
+								style-src * 'unsafe-inline';
 								report-uri https://gapple.report-uri.io/r/default/csp/enforce;
 
 							Content-Security-Policy-Report-Only:
