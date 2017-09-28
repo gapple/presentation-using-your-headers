@@ -648,12 +648,12 @@
 						<div class="section">Content Security Policy</div>
 					</div>
 					<ul>
-						<li>default-src</li>
 						<li>script-src</li>
 						<li>style-src</li>
 						<li>img-src</li>
 						<li>connect-src</li>
 						<li>frame-src</li>
+						<li>default-src</li>
 						<li class="fragment" data-fragment-index="1">upgrade-insecure-requests</li>
 						<li class="fragment" data-fragment-index="1">report-uri</li>
 					</ul>
@@ -675,7 +675,7 @@
 					<ul>
 						<li>'none'</li>
 						<li>'self'</li>
-						<li>'all'</li>
+						<li>*</li>
 						<li>'unsafe-inline'</li>
 						<li>'unsafe-eval'</li>
 						<li class="fragment" data-fragment-index="1">example.com</li>
@@ -719,19 +719,14 @@
 					</div>
 					<figure class="code">
 						<pre><code class="no-highlight" data-escape>
-							Content-Security-Policy-Report-Only:
-								default-src 'self';
-								script-src 'self';
-								style-src 'self';
-								img-src 'self';
-								connect-src 'self';
-								report-uri https://gapple.report-uri.io/r/default/csp/reportOnly;
-
 							Content-Security-Policy:
 								script-src 'self';
 								style-src 'self';
-								img-src 'all';
 								report-uri https://gapple.report-uri.io/r/default/csp/enforce;
+
+							Content-Security-Policy-Report-Only:
+								default-src 'self';
+								report-uri https://gapple.report-uri.io/r/default/csp/reportOnly;
 						</code></pre>
 					</figure>
 				</div>
